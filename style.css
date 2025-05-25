@@ -918,3 +918,9 @@ header h1 {
     max-width: none;
   }
 }
+
+
+.date-filters .active {
+  background: var(--primary);
+  color: #fff;
+}
