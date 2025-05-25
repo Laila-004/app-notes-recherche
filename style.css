@@ -1,0 +1,19 @@
+.date-filters {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.date-filter {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--bg-light);
+    border: 2px solid var(--border);
+    transition: var(--transition);
+}
+
+.date-filter.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
