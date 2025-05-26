@@ -6,6 +6,7 @@ class NotesApp {
     this.currentView = "grid"
     this.currentSort = "newest"
     this.deleteNoteId = null
+    this.currentDateFilter = "all" //
     this.initializeElements()
     this.bindEvents()
     this.renderNotes()
@@ -53,6 +54,9 @@ class NotesApp {
 
     // Thème
     this.themeSwitch = document.getElementById("themeSwitch")
+
+    // Filtres de date
+    this.dateFilters = document.getElementById("dateFilters") // <-- Ajouté
   }
 
   bindEvents() {
@@ -117,6 +121,18 @@ class NotesApp {
         if (this.confirmDialog.classList.contains("show")) this.closeConfirmDialog()
       }
     })
+
+    // Filtres de date
+    if (this.dateFilters) {
+      this.dateFilters.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          this.currentDateFilter = btn.dataset.filter
+          this.dateFilters.querySelectorAll("button").forEach(b => b.classList.remove("active"))
+          btn.classList.add("active")
+          this.renderNotes()
+        })
+      })
+    }
   }
 
   initializeTheme() {
@@ -311,6 +327,20 @@ class NotesApp {
     return sortedNotes
   }
 
+  filterNotesByDate(notes) {
+    const now = new Date()
+    if (this.currentDateFilter === "week") {
+      const startOfWeek = new Date(now)
+      startOfWeek.setDate(now.getDate() - now.getDay())
+      return notes.filter(note => new Date(note.createdAt) >= startOfWeek)
+    }
+    if (this.currentDateFilter === "month") {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      return notes.filter(note => new Date(note.createdAt) >= startOfMonth)
+    }
+    return notes
+  }
+
   formatDate(dateString) {
     const date = new Date(dateString)
     const now = new Date()
@@ -346,6 +376,7 @@ class NotesApp {
 
   renderNotes(notesToRender = null, searchQuery = "") {
     let notes = notesToRender || this.notes
+    notes = this.filterNotesByDate(notes) // <-- Ajouté
     notes = this.sortNotes(notes)
 
     if (notes.length === 0) {
@@ -434,7 +465,31 @@ class NotesApp {
       this.openModal()
     }
   }
+
+  applyDateFilter(filter) {
+    const now = new Date()
+    let startDate
+
+    switch (filter) {
+      case "all":
+        this.renderNotes()
+        return
+      case "week":
+        startDate = new Date(now.setDate(now.getDate() - 7))
+        break
+      case "month":
+        startDate = new Date(now.setMonth(now.getMonth() - 1))
+        break
+      default:
+        return
+    }
+
+    const filteredNotes = this.notes.filter((note) => new Date(note.createdAt) >= startDate)
+    this.renderNotes(filteredNotes)
+  }
+
 }
+
 
 // Initialiser l'application
 document.addEventListener("DOMContentLoaded", () => {

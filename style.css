@@ -918,3 +918,29 @@ header h1 {
     max-width: none;
   }
 }
+
+.date-filters {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 0;
+
+}
+
+.date-filters .btn {
+  padding: 7px 18px;
+  font-size: 0.95rem;
+  border-radius: 20px;
+  min-width: unset;
+  box-shadow: none;
+}
+
+.date-filters .active {
+  background: var(--primary);
+  color: #fff;
+}
+
+
+

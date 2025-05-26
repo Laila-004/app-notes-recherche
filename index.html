@@ -30,9 +30,8 @@
         <div class="main-content">
             <header>
                 <h1>Mes Notes</h1>
-                <p class="subtitle">Organisez vos idées en toute simplicité</p>
+                <div class="subtitle">Organiser des idées en toute simplicité</div>
             </header>
-
             <div class="action-bar">
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
@@ -45,6 +44,13 @@
                     <i class="fas fa-plus"></i>
                     <span>Nouvelle Note</span>
                 </button>
+            </div>
+
+            <!-- Filtres par date -->
+            <div id="dateFilters" class="date-filters">
+                <button class="btn btn-secondary" data-filter="all">Toutes</button>
+                <button class="btn btn-secondary" data-filter="week">Cette semaine</button>
+                <button class="btn btn-secondary" data-filter="month">Ce mois-ci</button>
             </div>
 
             <div class="view-options">
