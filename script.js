@@ -6,7 +6,7 @@ class NotesApp {
     this.currentView = "grid"
     this.currentSort = "newest"
     this.deleteNoteId = null
-    this.currentDateFilter = "all"
+    this.currentDateFilter = "all" //
     this.initializeElements()
     this.bindEvents()
     this.renderNotes()
@@ -14,19 +14,24 @@ class NotesApp {
   }
 
   initializeElements() {
+    // Conteneurs principaux
     this.notesContainer = document.getElementById("notesContainer")
     this.noNotesMessage = document.getElementById("noNotesMessage")
 
+    // Recherche
     this.searchInput = document.getElementById("searchInput")
     this.clearSearchBtn = document.getElementById("clearSearch")
 
+    // Boutons d'action
     this.addBtn = document.getElementById("addBtn")
     this.emptyAddBtn = document.getElementById("emptyAddBtn")
 
+    // Options de vue
     this.gridViewBtn = document.getElementById("gridViewBtn")
     this.listViewBtn = document.getElementById("listViewBtn")
     this.sortSelect = document.getElementById("sortSelect")
 
+    // Modal d'édition
     this.noteModal = document.getElementById("noteModal")
     this.modalTitle = document.getElementById("modalTitle")
     this.noteTitle = document.getElementById("noteTitle")
@@ -36,27 +41,34 @@ class NotesApp {
     this.closeModal = document.getElementById("closeModal")
     this.colorOptions = document.querySelectorAll(".color-option")
 
+    // Toast de notification
     this.toast = document.getElementById("toast")
     this.toastMessage = document.getElementById("toastMessage")
 
+    // Modal de confirmation
     this.confirmDialog = document.getElementById("confirmDialog")
     this.confirmBtn = document.getElementById("confirmBtn")
     this.cancelConfirmBtn = document.getElementById("cancelConfirmBtn")
     this.confirmTitle = document.getElementById("confirmTitle")
     this.confirmMessage = document.getElementById("confirmMessage")
 
+    // Thème
     this.themeSwitch = document.getElementById("themeSwitch")
 
-    this.dateFilters = document.getElementById("dateFilters")
+    // Filtres de date
+    this.dateFilters = document.getElementById("dateFilters") // <-- Ajouté
   }
 
   bindEvents() {
+    // Boutons d'ajout
     this.addBtn.addEventListener("click", () => this.openModal())
 
+    // Actions du modal
     this.saveBtn.addEventListener("click", () => this.saveNote())
     this.cancelBtn.addEventListener("click", () => this.closeModalHandler())
     this.closeModal.addEventListener("click", () => this.closeModalHandler())
 
+    // Recherche
     this.searchInput.addEventListener("input", (e) => this.searchNotes(e.target.value))
     this.clearSearchBtn.addEventListener("click", () => {
       this.searchInput.value = ""
@@ -64,6 +76,7 @@ class NotesApp {
       this.searchInput.focus()
     })
 
+    // Options de vue
     this.gridViewBtn.addEventListener("click", () => this.changeView("grid"))
     this.listViewBtn.addEventListener("click", () => this.changeView("list"))
     this.sortSelect.addEventListener("change", () => {
@@ -71,6 +84,7 @@ class NotesApp {
       this.renderNotes()
     })
 
+    // Sélection de couleur
     this.colorOptions.forEach((option) => {
       option.addEventListener("click", () => {
         this.colorOptions.forEach((opt) => opt.classList.remove("selected"))
@@ -79,6 +93,7 @@ class NotesApp {
       })
     })
 
+    // Actions de confirmation
     this.confirmBtn.addEventListener("click", () => {
       if (this.deleteNoteId) {
         this.deleteNoteConfirmed(this.deleteNoteId)
@@ -87,8 +102,10 @@ class NotesApp {
     })
     this.cancelConfirmBtn.addEventListener("click", () => this.closeConfirmDialog())
 
+    // Thème
     this.themeSwitch.addEventListener("change", () => this.toggleTheme())
 
+    // Fermer les modals en cliquant à l'extérieur
     this.noteModal.addEventListener("click", (e) => {
       if (e.target === this.noteModal) this.closeModalHandler()
     })
@@ -97,6 +114,7 @@ class NotesApp {
       if (e.target === this.confirmDialog) this.closeConfirmDialog()
     })
 
+    // Raccourci clavier Échap
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (this.noteModal.classList.contains("show")) this.closeModalHandler()
@@ -104,9 +122,10 @@ class NotesApp {
       }
     })
 
+    // Filtres de date
     if (this.dateFilters) {
       this.dateFilters.querySelectorAll("button").forEach(btn => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", (e) => {
           this.currentDateFilter = btn.dataset.filter
           this.dateFilters.querySelectorAll("button").forEach(b => b.classList.remove("active"))
           btn.classList.add("active")
@@ -195,7 +214,11 @@ class NotesApp {
       this.selectedColor = note.color || "#6366f1"
 
       this.colorOptions.forEach((option) => {
-        option.classList.toggle("selected", option.dataset.color === this.selectedColor)
+        if (option.dataset.color === this.selectedColor) {
+          option.classList.add("selected")
+        } else {
+          option.classList.remove("selected")
+        }
       })
     } else {
       this.modalTitle.textContent = "Ajouter une note"
@@ -204,7 +227,11 @@ class NotesApp {
       this.selectedColor = "#6366f1"
 
       this.colorOptions.forEach((option) => {
-        option.classList.toggle("selected", option.dataset.color === "#6366f1")
+        if (option.dataset.color === "#6366f1") {
+          option.classList.add("selected")
+        } else {
+          option.classList.remove("selected")
+        }
       })
     }
 
@@ -237,119 +264,37 @@ class NotesApp {
           color: this.selectedColor,
           updatedAt: new Date().toISOString(),
         }
-        this.showToast("Note modifiée avec succès", "success")
+        this.showToast("Note modifiée avec succès! ✅")
       }
     } else {
       const newNote = {
         id: Date.now().toString(),
         title,
         content,
-        createdAt: new Date().toISOString(),
         color: this.selectedColor,
+        createdAt: new Date().toISOString(),
       }
-      this.notes.push(newNote)
-      this.showToast("Note ajoutée avec succès", "success")
+      this.notes.unshift(newNote)
+      this.showToast("Note ajoutée avec succès! 🎉")
     }
 
     this.saveNotes()
-    this.closeModalHandler()
     this.renderNotes()
+    this.closeModalHandler()
   }
 
-  renderNotes(filteredNotes = null) {
-    // Appliquer filtre par date si demandé
-    let notesToRender = filteredNotes || [...this.notes]
-
-    if (this.currentDateFilter !== "all") {
-      const now = new Date()
-      let startDate
-
-      if (this.currentDateFilter === "week") {
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
-      } else if (this.currentDateFilter === "month") {
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-      }
-
-      notesToRender = notesToRender.filter(note => new Date(note.createdAt) >= startDate)
+  deleteNote(id) {
+    if (confirm("Voulez-vous vraiment supprimer cette note ?")) {
+      this.notes = this.notes.filter(note => note.id !== id)
+      this.renderNotes()
     }
-
-    // Appliquer tri
-    notesToRender.sort((a, b) => {
-      switch (this.currentSort) {
-        case "newest":
-          return new Date(b.createdAt) - new Date(a.createdAt)
-        case "oldest":
-          return new Date(a.createdAt) - new Date(b.createdAt)
-        case "titleAsc":
-          return a.title.localeCompare(b.title)
-        case "titleDesc":
-          return b.title.localeCompare(a.title)
-        default:
-          return 0
-      }
-    })
-
-    this.notesContainer.innerHTML = ""
-
-    if (notesToRender.length === 0) {
-      this.noNotesMessage.style.display = "block"
-      this.emptyAddBtn.style.display = "inline-block"
-      this.addBtn.style.display = "none"
-      return
-    } else {
-      this.noNotesMessage.style.display = "none"
-      this.emptyAddBtn.style.display = "none"
-      this.addBtn.style.display = "inline-block"
-    }
-
-    notesToRender.forEach((note) => {
-      const noteEl = document.createElement("div")
-      noteEl.className = "note"
-      noteEl.style.borderColor = note.color || "#6366f1"
-
-      if (this.currentView === "list") {
-        noteEl.classList.add("note-list")
-      }
-
-      noteEl.innerHTML = `
-        <h3 class="note-title">${this.escapeHtml(note.title)}</h3>
-        <p class="note-content">${this.escapeHtml(note.content)}</p>
-        <p class="note-date">${this.formatDate(note.createdAt)}</p>
-        <div class="note-actions">
-          <button class="edit-btn" title="Modifier la note">✏️</button>
-          <button class="delete-btn" title="Supprimer la note">🗑️</button>
-        </div>
-      `
-
-      const editBtn = noteEl.querySelector(".edit-btn")
-      const deleteBtn = noteEl.querySelector(".delete-btn")
-
-      editBtn.addEventListener("click", () => this.editNote(note.id))
-      deleteBtn.addEventListener("click", () => this.confirmDeleteNote(note.id))
-
-      this.notesContainer.appendChild(noteEl)
-    })
-  }
-
-  editNote(id) {
-    const note = this.notes.find(n => n.id === id)
-    if (note) {
-      this.openModal(note)
-    }
-  }
-
-  confirmDeleteNote(id) {
-    this.deleteNoteId = id
-    this.confirmTitle.textContent = "Confirmer la suppression"
-    this.confirmMessage.textContent = "Voulez-vous vraiment supprimer cette note ?"
-    this.confirmDialog.classList.add("show")
   }
 
   deleteNoteConfirmed(id) {
-    this.notes = this.notes.filter(note => note.id !== id)
+    this.notes = this.notes.filter((note) => note.id !== id)
     this.saveNotes()
     this.renderNotes()
-    this.showToast("Note supprimée avec succès", "success")
+    this.showToast("Note supprimée avec succès! 🗑️")
   }
 
   closeConfirmDialog() {
@@ -358,25 +303,151 @@ class NotesApp {
   }
 
   searchNotes(query) {
-    const filtered = this.notes.filter(note =>
-      note.title.toLowerCase().includes(query.toLowerCase()) ||
-      note.content.toLowerCase().includes(query.toLowerCase())
+    const filteredNotes = this.notes.filter(
+      (note) =>
+        note.title.toLowerCase().includes(query.toLowerCase()) ||
+        note.content.toLowerCase().includes(query.toLowerCase()),
     )
-    this.renderNotes(filtered)
+    this.renderNotes(filteredNotes, query)
+  }
+
+  sortNotes(notes) {
+    const sortedNotes = [...notes]
+    switch (this.currentSort) {
+      case "newest":
+        sortedNotes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        break
+      case "oldest":
+        sortedNotes.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        break
+      case "title":
+        sortedNotes.sort((a, b) => a.title.localeCompare(b.title))
+        break
+    }
+    return sortedNotes
+  }
+
+  filterNotesByDate(notes) {
+    const now = new Date()
+    if (this.currentDateFilter === "week") {
+      const startOfWeek = new Date(now)
+      startOfWeek.setDate(now.getDate() - now.getDay())
+      return notes.filter(note => new Date(note.createdAt) >= startOfWeek)
+    }
+    if (this.currentDateFilter === "month") {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      return notes.filter(note => new Date(note.createdAt) >= startOfMonth)
+    }
+    return notes
   }
 
   formatDate(dateString) {
     const date = new Date(dateString)
-    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    const now = new Date()
+    const diffTime = Math.abs(now - date)
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) return "Aujourd'hui"
+    if (diffDays === 1) return "Hier"
+    if (diffDays < 7) return `Il y a ${diffDays} jours`
+
+    return date.toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
   }
 
   showToast(message, type = "success") {
     this.toastMessage.textContent = message
-    this.toast.className = `toast ${type} show`
-    clearTimeout(this.toastTimeout)
-    this.toastTimeout = setTimeout(() => {
-      this.toast.classList.remove("show")
-    }, 3000)
+    const iconElement = this.toast.querySelector(".toast-icon i")
+
+    if (type === "success") {
+      iconElement.className = "fas fa-check-circle"
+      iconElement.style.color = "var(--success)"
+    } else if (type === "error") {
+      iconElement.className = "fas fa-exclamation-circle"
+      iconElement.style.color = "var(--danger)"
+    }
+
+    this.toast.classList.add("show")
+    setTimeout(() => this.toast.classList.remove("show"), 3000)
+  }
+
+  renderNotes(notesToRender = null, searchQuery = "") {
+    let notes = notesToRender || this.notes
+    notes = this.filterNotesByDate(notes) // <-- Ajouté
+    notes = this.sortNotes(notes)
+
+    if (notes.length === 0) {
+      this.notesContainer.style.display = "none"
+      this.noNotesMessage.style.display = "block"
+
+      if (searchQuery) {
+        this.noNotesMessage.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <p>Aucune note trouvée pour "${this.escapeHtml(searchQuery)}"</p>
+            <button onclick="app.searchInput.value=''; app.searchNotes('')" class="btn btn-secondary">
+              <i class="fas fa-times"></i>
+              <span>Effacer la recherche</span>
+            </button>
+          </div>
+        `
+      } else {
+        this.noNotesMessage.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>Aucune note pour le moment</p>
+            <button onclick="app.openModal()" class="btn btn-primary">
+              <i class="fas fa-plus"></i>
+              <span>Créer ma première note</span>
+            </button>
+          </div>
+        `
+      }
+      return
+    }
+
+    this.noNotesMessage.style.display = "none"
+    this.notesContainer.style.display = "grid"
+
+    this.notesContainer.innerHTML = notes
+      .map(
+        (note) => `
+          <div class="note-card" data-id="${note.id}" data-color="${note.color || "#6366f1"}">
+            <div class="note-header">
+              <h3 class="note-title">${this.escapeHtml(note.title)}</h3>
+              <div class="note-actions">
+                <button class="note-btn edit" onclick="app.editNote('${note.id}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="note-btn delete" onclick="app.deleteNote('${note.id}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="note-content">${this.escapeHtml(note.content)}</div>
+            <div class="note-footer">
+              <div class="note-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>${this.formatDate(note.createdAt)}</span>
+              </div>
+              ${
+                note.updatedAt
+                  ? `
+                <div class="note-updated">
+                  <i class="fas fa-edit"></i>
+                  <span>Modifiée</span>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          </div>
+        `,
+      )
+      .join("")
   }
 
   escapeHtml(text) {
@@ -384,8 +455,43 @@ class NotesApp {
     div.textContent = text
     return div.innerHTML
   }
+
+  editNote(id) {
+    const note = this.notes.find(n => n.id === id)
+    if (note) {
+      this.noteTitle.value = note.title
+      this.noteContent.value = note.content
+      this.currentEditId = id
+      this.openModal()
+    }
+  }
+
+  applyDateFilter(filter) {
+    const now = new Date()
+    let startDate
+
+    switch (filter) {
+      case "all":
+        this.renderNotes()
+        return
+      case "week":
+        startDate = new Date(now.setDate(now.getDate() - 7))
+        break
+      case "month":
+        startDate = new Date(now.setMonth(now.getMonth() - 1))
+        break
+      default:
+        return
+    }
+
+    const filteredNotes = this.notes.filter((note) => new Date(note.createdAt) >= startDate)
+    this.renderNotes(filteredNotes)
+  }
+
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+
+// Initialiser l'application
+document.addEventListener("DOMContentLoaded", () => {
   window.app = new NotesApp()
 })
