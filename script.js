@@ -268,13 +268,9 @@ class NotesApp {
   }
 
   deleteNote(id) {
-    this.deleteNoteId = id
-    const note = this.notes.find((note) => note.id === id)
-
-    if (note) {
-      this.confirmTitle.textContent = `Supprimer "${note.title}"`
-      this.confirmMessage.textContent = "Êtes-vous sûr de vouloir supprimer cette note ? Cette action est irréversible."
-      this.confirmDialog.classList.add("show")
+    if (confirm("Voulez-vous vraiment supprimer cette note ?")) {
+      this.notes = this.notes.filter(note => note.id !== id)
+      this.renderNotes()
     }
   }
 
@@ -392,7 +388,7 @@ class NotesApp {
             <div class="note-header">
               <h3 class="note-title">${this.escapeHtml(note.title)}</h3>
               <div class="note-actions">
-                <button class="note-btn edit" onclick="app.openModal(app.notes.find(n => n.id === '${note.id}'))">
+                <button class="note-btn edit" onclick="app.editNote('${note.id}')">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button class="note-btn delete" onclick="app.deleteNote('${note.id}')">
@@ -427,6 +423,16 @@ class NotesApp {
     const div = document.createElement("div")
     div.textContent = text
     return div.innerHTML
+  }
+
+  editNote(id) {
+    const note = this.notes.find(n => n.id === id)
+    if (note) {
+      this.noteTitle.value = note.title
+      this.noteContent.value = note.content
+      this.currentEditId = id
+      this.openModal()
+    }
   }
 }
 
