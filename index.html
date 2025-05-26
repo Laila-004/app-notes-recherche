@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteFlow - Application de Notes Professionnelle</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-sticky-note"></i>
+                <span>NoteFlow</span>
+            </div>
+            <div class="theme-toggle">
+                <input type="checkbox" id="themeSwitch" class="theme-switch">
+                <label for="themeSwitch" class="theme-switch-label">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                    <span class="ball"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header>
+                <h1>Mes Notes</h1>
+                <div class="subtitle">Organiser des idées en toute simplicité</div>
+            </header>
+            <div class="action-bar">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Rechercher des notes..." class="search-input">
+                    <button id="clearSearch" class="clear-search-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <button id="addBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    <span>Nouvelle Note</span>
+                </button>
+            </div>
+
+            <!-- Filtres par date -->
+            <div id="dateFilters" class="date-filters">
+                <button class="btn btn-secondary" data-filter="all">Toutes</button>
+                <button class="btn btn-secondary" data-filter="week">Cette semaine</button>
+                <button class="btn btn-secondary" data-filter="month">Ce mois-ci</button>
+            </div>
+
+            <div class="view-options">
+                <button id="gridViewBtn" class="view-btn active">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button id="listViewBtn" class="view-btn">
+                    <i class="fas fa-list"></i>
+                </button>
+                <div class="sort-container">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="newest">Plus récentes</option>
+                        <option value="oldest">Plus anciennes</option>
+                        <option value="title">Titre (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="notesContainer" class="notes-grid">
+                <!-- Les notes seront ajoutées ici dynamiquement -->
+            </div>
+
+            <div id="noNotesMessage" class="no-notes">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Aucune note pour le moment</p>
+                    <button id="emptyAddBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Créer ma première note</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une note -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Ajouter une note</h2>
+                <button id="closeModal" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="noteTitle">Titre</label>
+                    <input type="text" id="noteTitle" placeholder="Titre de la note" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="noteColor">Couleur</label>
+                    <div class="color-picker">
+                        <div class="color-option selected" data-color="#6366f1" style="background-color: #6366f1;"></div>
+                        <div class="color-option" data-color="#ec4899" style="background-color: #ec4899;"></div>
+                        <div class="color-option" data-color="#14b8a6" style="background-color: #14b8a6;"></div>
+                        <div class="color-option" data-color="#f59e0b" style="background-color: #f59e0b;"></div>
+                        <div class="color-option" data-color="#ef4444" style="background-color: #ef4444;"></div>
+                        <div class="color-option" data-color="#8b5cf6" style="background-color: #8b5cf6;"></div>
+                        <div class="color-option" data-color="#10b981" style="background-color: #10b981;"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="noteContent">Contenu</label>
+                    <textarea id="noteContent" placeholder="Contenu de la note" class="form-textarea" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn btn-secondary">Annuler</button>
+                <button id="saveBtn" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notification -->
+    <div id="toast" class="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-content">
+            <p id="toastMessage">Note enregistrée avec succès!</p>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div id="confirmDialog" class="modal">
+        <div class="modal-content confirm-content">
+            <div class="confirm-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="confirmTitle">Supprimer la note</h3>
+            <p id="confirmMessage">Êtes-vous sûr de vouloir supprimer cette note ?</p>
+            <div class="confirm-actions">
+                <button id="cancelConfirmBtn" class="btn btn-secondary">Annuler</button>
+                <button id="confirmBtn" class="btn btn-danger">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
