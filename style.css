@@ -1,19 +1,22 @@
+/* Conteneur des filtres par date - alignement à droite */
 .date-filters {
-    display: flex;
-    gap: 10px;
-    margin-left: auto;
+    display: flex; /* Disposition flex pour aligner les boutons côte à côte */
+    gap: 10px; /* Espacement entre les boutons */
+    margin-left: auto; /* Alignement à droite dans le conteneur parent */
 }
 
+/* Style de base des boutons de filtre */
 .date-filter {
-    padding: 8px 16px;
-    border-radius: 20px;
-    background: var(--bg-light);
-    border: 2px solid var(--border);
-    transition: var(--transition);
+    padding: 8px 16px; /* Espacement interne */
+    border-radius: 20px; /* Coins arrondis (style "pill") */
+    background: var(--bg-light); /* Couleur de fond depuis variable CSS */
+    border: 2px solid var(--border); /* Bordure avec couleur variable */
+    transition: var(--transition); /* Animation fluide au survol/changement d'état */
 }
 
+/* État actif du filtre - mise en valeur visuelle */
 .date-filter.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: var(--primary); /* Fond coloré avec la couleur principale */
+    color: white; /* Texte blanc pour contraste */
+    border-color: var(--primary); /* Bordure assortie au fond */
 }
